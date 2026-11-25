@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ethan Lee — Product Designer</title>
+<meta name="description" content="Ethan Lee is a product designer and game builder studying Cognitive Science at UCLA.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================
+   THEME VARIABLES — change these to retheme the whole site
+   FONTS: Valorant's headline font looks like Tungsten and its
+   UI text like DIN Next (both licensed). Bebas Neue + Barlow are
+   the closest free Google Fonts. To use licensed fonts, change
+   --font-display and --font-body only.
+   ========================================================== */
+:root{
+  --bg:#0b141d;
+  --bg-2:#0f1923;
+  --panel-solid:#121e29;
+  --text:#ece8e1;            /* body text (AA on --bg) */
+  --muted:#aab4bd;           /* secondary text (AA on --bg) */
+
+  --primary:#ff4655;         /* main accent (red) */
+  --primary-rgb:255,70,85;
+  --secondary:#3be8d2;       /* second accent (teal) */
+  --secondary-rgb:59,232,210;
+
+  --line:rgba(236,232,225,.16);
+  --line-hot:rgba(var(--primary-rgb),.95);
+
+  --glow-sm:0 0 8px rgba(var(--primary-rgb),.45);
+  --glow-md:0 0 18px rgba(var(--primary-rgb),.55);
+  --glow-lg:0 0 36px rgba(var(--primary-rgb),.55);
+  --glow-alt:0 0 14px rgba(var(--secondary-rgb),.55);
+
+  --t-fast:150ms;
+  --t-med:200ms;
+  --t-slow:600ms;
+  --ease:cubic-bezier(.2,.8,.2,1);
+
+  --font-display:'Bebas Neue','Oswald','Arial Narrow',Impact,sans-serif;
+  --font-body:'Barlow',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+
+  --hero-img:none;           /* e.g. url("hero.jpg") for a hero background image */
+  --header-h:56px;
+  --menu-w:250px;
+  --rail-w:60px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--font-body);
+  line-height:1.6;font-size:17px;overflow-x:hidden;
+}
+/* background: teal vignette + faint grid */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 15%,rgba(38,86,110,.55),transparent 70%),
+    radial-gradient(ellipse 70% 50% at 50% 110%,rgba(var(--primary-rgb),.10),transparent 60%),
+    linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:auto,auto,64px 64px,64px 64px;
+}
+/* scanlines + edge vignette */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+  background:
+    repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 1px,transparent 1px 3px),
+    radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%);
+}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+img{max-width:100%;display:block}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+main,footer{position:relative;z-index:2}
+section{position:relative;z-index:2;padding:110px 0}
+.wrap{width:100%;max-width:1500px;margin:0 auto;padding:0 24px;position:relative;z-index:2}
+@media(min-width:900px){.wrap{padding-right:calc(var(--rail-w) + 28px)}}
+@media(min-width:1100px){.wrap{padding-left:calc(var(--menu-w) + 20px)}}
+
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--secondary);outline-offset:3px}
+
+/* ---------- shared angular shape (cut corners) ---------- */
+.hud::before,.hud::after,
+.btn::before,.btn::after,.btn .fx{
+  clip-path:polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));
+}
+
+/* ---------- HUD panel ---------- */
+.hud{
+  --cut:14px;position:relative;isolation:isolate;padding:24px;
+  transition:transform var(--t-med) var(--ease),filter var(--t-med) var(--ease);
+}
+.hud::before,.hud::after{content:"";position:absolute;transition:background var(--t-med)}
+.hud::before{inset:0;background:var(--line);z-index:-2}
+.hud::after{inset:1px;background:linear-gradient(160deg,rgba(24,40,55,.94),rgba(13,22,31,.94));z-index:-1}
+.hoverable:hover,.hoverable:focus-visible{
+  transform:translateY(-5px);filter:drop-shadow(0 0 14px rgba(var(--primary-rgb),.5));
+}
+.hoverable:hover::before,.hoverable:focus-visible::before{background:var(--primary)}
+.hoverable:active{transform:translateY(0) scale(.99);filter:drop-shadow(0 0 6px rgba(var(--primary-rgb),.4))}
+
+/* pennant (tall banner card with pointed bottom) */
+.pennant{--tip:36px;padding-bottom:calc(var(--tip) + 12px)}
+.pennant::before,.pennant::after{
+  clip-path:polygon(0 0,100% 0,100% calc(100% - var(--tip)),50% 100%,0 calc(100% - var(--tip)));
+}
+
+/* ---------- buttons ---------- */
+.btn{
+  --c:var(--primary);--c-rgb:var(--primary-rgb);--cut:9px;
+  position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;
+  font-family:var(--font-display);font-size:22px;letter-spacing:.1em;text-transform:uppercase;line-height:1;color:#fff;
+  padding:16px 30px;border:0;background:none;
+  filter:drop-shadow(0 5px 0 rgba(var(--c-rgb),.5)) drop-shadow(0 0 0 rgba(var(--c-rgb),0));
+  transition:transform var(--t-fast) var(--ease),filter var(--t-fast) var(--ease);
+}
+.btn::before,.btn::after{content:"";position:absolute}
+.btn::before{inset:0;background:var(--edge,var(--c));z-index:-3}
+.btn::after{inset:2px;background:var(--fill,color-mix(in srgb,var(--c) 22%,var(--bg-2)));z-index:-2;transition:filter var(--t-fast)}
+.btn .fx{position:absolute;inset:2px;overflow:hidden;z-index:-1;pointer-events:none}
+.btn.alt{--c:var(--secondary);--c-rgb:var(--secondary-rgb)}
+.btn-ghost{--c:#8da2b4;--c-rgb:141,162,180}
+.btn-start{--cut:12px;font-size:32px;padding:20px 56px;--fill:var(--c);--edge:rgba(255,255,255,.6)}
+.btn.sm{font-size:17px;padding:11px 20px}
+.btn:hover{transform:translateY(-3px) scale(1.02);
+  filter:drop-shadow(0 7px 0 rgba(var(--c-rgb),.5)) drop-shadow(0 0 16px rgba(var(--c-rgb),.75))}
+.btn:hover::after{filter:brightness(1.6)}
+.btn:active,.btn.pressed{transform:translateY(5px) scale(.99);
+  filter:drop-shadow(0 0 0 rgba(var(--c-rgb),.5)) drop-shadow(0 0 8px rgba(var(--c-rgb),.5))}
+.btn.flash::after{animation:flash 240ms ease-out}
+@keyframes flash{0%{filter:brightness(2.6)}100%{filter:brightness(1)}}
+.ripple{position:absolute;border-radius:50%;pointer-events:none;background:rgba(255,255,255,.55);
+  transform:scale(0);animation:ripple 550ms ease-out forwards}
+@keyframes ripple{to{transform:scale(1);opacity:0}}
+
+/* small utility button (sound / menu) */
+.icon-btn{
+  background:rgba(255,255,255,.04);border:1px solid var(--line);border-left:3px solid var(--primary);color:var(--text);
+  font:700 12px var(--font-body);letter-spacing:.14em;text-transform:uppercase;padding:9px 14px;cursor:pointer;
+  transition:transform var(--t-fast) var(--ease),border-color var(--t-fast),box-shadow var(--t-fast),background var(--t-fast);
+}
+.icon-btn:hover{border-color:var(--primary);box-shadow:var(--glow-sm);transform:translateY(-2px);background:rgba(var(--primary-rgb),.12)}
+.icon-btn:active{transform:translateY(1px);box-shadow:none}
+.icon-btn[aria-pressed="false"]{color:var(--muted);border-left-color:var(--muted)}
+
+/* ---------- top bar ---------- */
+#top{
+  position:fixed;top:0;left:0;right:0;height:var(--header-h);z-index:90;
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:0 16px 0 22px;
+  background:linear-gradient(180deg,rgba(6,10,15,.94),rgba(6,10,15,.6));backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.back{font:700 13px var(--font-body);letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+  display:inline-flex;align-items:center;gap:8px;justify-self:start;transition:color var(--t-fast),text-shadow var(--t-fast),transform var(--t-fast)}
+.back .chev{font-size:22px;line-height:1;color:var(--text)}
+.back:hover{color:var(--text);text-shadow:0 0 12px rgba(var(--primary-rgb),.8);transform:translateX(-3px)}
+.top-title{font-family:var(--font-display);font-size:38px;letter-spacing:.12em;text-transform:uppercase;line-height:1;
+  text-shadow:0 0 18px rgba(var(--primary-rgb),.35);text-align:center}
+.top-title.swap{animation:titleIn 260ms var(--ease)}
+@keyframes titleIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+.top-right{display:flex;align-items:center;gap:10px;justify-self:end}
+.chip{font:700 12px var(--font-body);letter-spacing:.14em;color:var(--text);border:1px solid var(--line);padding:7px 11px;
+  background:rgba(255,255,255,.04);white-space:nowrap}
+.chip::before{content:"◆";color:var(--primary);margin-right:8px;font-size:9px;vertical-align:1px}
+#menuBtn{display:none}
+#xp{position:fixed;top:var(--header-h);left:0;right:0;height:3px;z-index:91;background:rgba(255,255,255,.08)}
+#xp i{display:block;height:100%;transform-origin:left;transform:scaleX(0);
+  background:linear-gradient(90deg,var(--primary),var(--secondary));box-shadow:var(--glow-md)}
+
+/* ---------- left menu (Valorant main-menu style) ---------- */
+#menu{position:fixed;left:38px;top:calc(50% + 24px);transform:translateY(-50%);z-index:80;display:none}
+#menu a{
+  display:flex;align-items:center;gap:14px;font-family:var(--font-display);font-size:34px;line-height:1.05;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--text);padding:7px 0;transform-origin:left center;
+  transition:transform var(--t-fast) var(--ease),color var(--t-fast),text-shadow var(--t-fast);
+}
+#menu a::before{content:"";width:7px;height:7px;background:currentColor;transform:rotate(45deg);flex:none}
+#menu a:hover{color:#fff;text-shadow:0 0 14px rgba(var(--primary-rgb),.85);transform:translateX(8px)}
+#menu a.active{color:var(--primary);transform:scale(1.3) translateX(2px);text-shadow:0 0 16px rgba(var(--primary-rgb),.5)}
+@media(min-width:1100px){#menu{display:block}}
+
+/* ---------- right rail ---------- */
+#rail{
+  position:fixed;right:0;top:var(--header-h);bottom:0;width:var(--rail-w);z-index:70;display:none;flex-direction:column;align-items:center;
+  gap:16px;padding:18px 0;background:rgba(6,10,15,.78);border-left:1px solid var(--line);
+}
+#rail .track{flex:1;width:4px;background:rgba(255,255,255,.12);position:relative;overflow:hidden}
+#rail .track i{position:absolute;inset:0;transform-origin:top;transform:scaleY(0);background:linear-gradient(var(--primary),var(--secondary));box-shadow:var(--glow-sm)}
+.rail-name{writing-mode:vertical-rl;font-family:var(--font-display);font-size:20px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+@media(min-width:900px){#rail{display:flex}}
+
+/* ---------- bottom-left status bar ("Party:") ---------- */
+.party{
+  position:fixed;left:0;bottom:0;width:var(--menu-w);height:34px;z-index:80;display:none;align-items:center;gap:10px;padding:0 14px;
+  background:rgba(6,10,15,.85);border-top:1px solid var(--line);border-right:1px solid var(--line);
+  font:600 12px var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+}
+.party b{color:var(--text);font-weight:700}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--secondary);box-shadow:var(--glow-alt);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
+@media(min-width:1100px){.party{display:flex}}
+
+/* ---------- section headings ---------- */
+.sec-head{margin-bottom:48px;opacity:0;transform:translateX(-30px)}
+.sec-head .kicker{font:700 12px var(--font-body);color:var(--secondary);letter-spacing:.26em;text-transform:uppercase}
+.sec-head h2{font-family:var(--font-display);font-size:clamp(48px,7vw,92px);line-height:.95;letter-spacing:.03em;text-transform:uppercase;
+  margin-top:6px;text-shadow:0 0 30px rgba(var(--primary-rgb),.25)}
+.sec-head h2::after{content:"";display:block;width:72px;height:5px;background:var(--primary);margin-top:14px;transform:skewX(-20deg);box-shadow:var(--glow-sm)}
+.sec-head p{color:var(--muted);margin-top:14px;max-width:60ch}
+.sec-head.in{animation:slideIn 600ms var(--ease) forwards,flicker 700ms steps(1) 1}
+@keyframes slideIn{to{opacity:1;transform:none}}
+@keyframes flicker{0%{filter:brightness(2)}15%{filter:brightness(.6)}30%{filter:brightness(1.8)}45%{filter:brightness(.8)}60%{filter:brightness(1.4)}100%{filter:brightness(1)}}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity var(--t-slow) var(--ease),transform var(--t-slow) var(--ease)}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- hero ---------- */
+#hero{min-height:100vh;display:flex;align-items:center;padding:calc(var(--header-h) + 40px) 0 80px}
+.hero-art{
+  position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;overflow:hidden;
+  background-image:var(--hero-img),
+    radial-gradient(ellipse 55% 70% at 72% 45%,rgba(var(--secondary-rgb),.16),transparent 70%),
+    radial-gradient(ellipse 50% 60% at 15% 85%,rgba(var(--primary-rgb),.16),transparent 70%);
+}
+.hero-art::before,.hero-art::after{content:"";position:absolute;transform:skewX(-14deg)}
+.hero-art::before{right:10%;top:-10%;width:30%;height:130%;background:linear-gradient(rgba(255,255,255,.05),rgba(255,255,255,.01))}
+.hero-art::after{right:42%;top:-10%;width:6%;height:130%;background:linear-gradient(rgba(var(--primary-rgb),.14),transparent)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(290px,.75fr);gap:48px;align-items:center}
+.promo{--cut:10px;display:grid;grid-template-columns:90px 1fr 90px;align-items:stretch;padding:0;width:min(100%,520px);height:58px;margin-bottom:38px;overflow:hidden}
+.p-img{background:repeating-linear-gradient(115deg,rgba(var(--primary-rgb),.5) 0 8px,rgba(var(--primary-rgb),.15) 8px 16px);opacity:.8}
+.p-img.r{background:repeating-linear-gradient(65deg,rgba(var(--secondary-rgb),.45) 0 8px,rgba(var(--secondary-rgb),.12) 8px 16px)}
+.p-text{display:grid;place-items:center;text-align:center;line-height:1.1;padding:6px}
+.p-text b{font-family:var(--font-display);font-size:26px;letter-spacing:.1em;font-weight:400;text-transform:uppercase}
+.p-text small{font:600 11px var(--font-body);letter-spacing:.22em;color:var(--muted);text-transform:uppercase}
+.eyebrow{font:700 14px var(--font-body);letter-spacing:.24em;color:var(--muted);text-transform:uppercase}
+#hero h1{font-family:var(--font-display);font-weight:400;font-size:clamp(64px,11vw,170px);line-height:.88;letter-spacing:.02em;
+  text-transform:uppercase;margin:10px 0 6px;text-shadow:0 0 50px rgba(var(--primary-rgb),.28);word-break:break-word}
+.hero-title{font:700 20px var(--font-body);letter-spacing:.34em;color:var(--secondary);text-transform:uppercase}
+.hero-pitch{margin:24px 0 38px;font-size:20px;color:var(--muted);max-width:48ch}
+.start-row{display:flex;gap:22px;flex-wrap:wrap;align-items:center}
+.hero-side{display:grid;gap:22px}
+.c-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:16px}
+.c-head b{font:700 14px var(--font-body);letter-spacing:.18em;text-transform:uppercase}
+.c-head small{font:600 12px var(--font-body);letter-spacing:.14em;color:var(--secondary);text-transform:uppercase}
+.mini-row{display:flex;gap:8px;margin-bottom:16px}
+.mini{flex:1;aspect-ratio:1;max-width:56px;border:2px solid var(--primary);background:rgba(var(--primary-rgb),.1);display:grid;place-items:center;
+  font-family:var(--font-display);font-size:22px;color:var(--text);transition:all var(--t-fast) var(--ease)}
+.mini:hover{background:rgba(var(--primary-rgb),.35);box-shadow:var(--glow-sm);transform:translateY(-3px)}
+.c-link{font:600 12px var(--font-body);letter-spacing:.16em;color:var(--muted);text-transform:uppercase;transition:color var(--t-fast)}
+.c-link:hover{color:var(--text)}
+.m-title{font:700 14px var(--font-body);letter-spacing:.16em;text-transform:uppercase;background:rgba(255,255,255,.07);padding:10px 14px;margin-bottom:6px}
+
+/* ---------- labels, tags, thumbs ---------- */
+.lvl{font:700 11px var(--font-body);letter-spacing:.24em;color:var(--primary);margin-bottom:10px;display:block;text-transform:uppercase}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.tag{font:700 11px var(--font-body);text-transform:uppercase;letter-spacing:.14em;padding:5px 10px;background:rgba(255,255,255,.07);
+  border-left:3px solid var(--secondary);color:var(--text)}
+.role{color:var(--secondary);font-size:14px;font-weight:600;letter-spacing:.04em;margin-bottom:6px}
+h3.t{font-family:var(--font-display);font-weight:400;font-size:32px;letter-spacing:.03em;line-height:1;text-transform:uppercase;margin-bottom:6px}
+.thumb{
+  position:relative;aspect-ratio:4/3;display:grid;place-items:center;color:var(--muted);font-size:13px;overflow:hidden;
+  margin:-23px -23px 18px;width:calc(100% + 46px);
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.04) 0 10px,transparent 10px 20px);
+  border-bottom:1px solid var(--line);
+}
+.thumb img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+.open-hint{font:700 12px var(--font-body);letter-spacing:.2em;margin-top:16px;display:block;text-align:center;opacity:.75;text-transform:uppercase;transition:color var(--t-fast),opacity var(--t-fast)}
+.hoverable:hover .open-hint{color:var(--primary);opacity:1}
+p.sm{color:var(--muted);font-size:15px}
+
+/* ---------- projects (pennant grid) ---------- */
+.grid{display:grid;gap:26px}
+.g-projects{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.g3{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.g2{grid-template-columns:repeat(auto-fill,minmax(420px,1fr))}
+.slot{display:flex}
+.slot .card-btn{height:100%}
+.card-btn{display:block;width:100%;text-align:left;font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+/* project cards: everything starts at the top so every thumbnail lines up, and the "open" hint sits at the bottom */
+.card-btn.pennant{display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch}
+.card-btn.pennant .thumb{flex:none}
+.pennant .lvl{position:absolute;bottom:10px;left:10px;z-index:2;margin:0;padding:4px 9px;background:rgba(6,10,15,.82);border-left:3px solid var(--primary)}
+.pennant .open-hint{margin-top:auto;padding-top:16px}
+.empty-slot{min-height:340px;display:grid;place-content:center;gap:6px;text-align:center;border:1px solid var(--line);background:rgba(10,18,26,.35);color:var(--muted)}
+.empty-slot span{font-family:var(--font-display);font-size:70px;line-height:1;color:rgba(236,232,225,.28)}
+
+/* ---------- timeline ---------- */
+.timeline{position:relative;padding-left:40px}
+.timeline::before{content:"";position:absolute;left:11px;top:8px;bottom:8px;width:2px;background:linear-gradient(var(--primary),rgba(var(--secondary-rgb),.8))}
+.t-item{position:relative;margin-bottom:22px}
+.t-item::before{content:"";position:absolute;left:-36px;top:30px;width:13px;height:13px;transform:rotate(45deg);background:var(--bg);
+  border:2px solid var(--primary);transition:all var(--t-med)}
+.t-item:hover::before{background:var(--primary);box-shadow:var(--glow-md)}
+.t-item h3{font-family:var(--font-display);font-weight:400;font-size:30px;letter-spacing:.03em;text-transform:uppercase;line-height:1.05}
+.t-item h3 span{color:var(--muted)}
+.t-item .meta{color:var(--secondary);font-size:14px;font-weight:600;letter-spacing:.06em;margin:4px 0 10px}
+.t-item li,.extra li{color:var(--muted);padding-left:20px;position:relative;margin:7px 0;font-size:16px}
+.t-item li::before,.extra li::before{content:"";position:absolute;left:2px;top:.6em;width:6px;height:6px;background:var(--primary);transform:rotate(45deg)}
+.extra h3{font:700 13px var(--font-body);letter-spacing:.18em;color:var(--primary);text-transform:uppercase;margin-bottom:10px}
+
+/* ---------- teardown banner cards ---------- */
+.banner-card{display:grid;grid-template-columns:230px 1fr auto;align-items:stretch;padding:0;margin-bottom:22px;overflow:hidden}
+.b-img{min-height:130px;display:grid;place-items:center;color:var(--muted);font-size:13px;clip-path:polygon(0 0,100% 0,calc(100% - 30px) 100%,0 100%);
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 10px,transparent 10px 20px)}
+.b-img{position:relative;overflow:hidden}
+.b-img:has(img){background:#000}
+.b-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:0 14px;display:block}
+.b-text{padding:20px 24px}
+.b-go{display:grid;place-items:center;padding:0 26px;font-family:var(--font-display);font-size:34px;color:var(--primary);transition:transform var(--t-fast),text-shadow var(--t-fast)}
+.banner-card:hover .b-go{transform:translateX(6px);text-shadow:var(--glow-md)}
+
+/* ---------- prototypes ---------- */
+.embed{aspect-ratio:16/10;border:1px dashed var(--line);margin-bottom:16px;display:grid;place-items:center;color:var(--muted);
+  font-size:14px;text-align:center;padding:12px;background:rgba(0,0,0,.28);overflow:hidden}
+.embed iframe,.embed video{width:100%;height:100%;border:0}
+.embed video{object-fit:contain;background:#000;display:block}
+.embed img{width:100%;height:100%;object-fit:cover;display:block}
+.embed:has(img){padding:0;border-style:solid}
+
+/* ---------- skills (mission rows) ---------- */
+.skill-row{display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:center;padding:12px 10px;
+  transition:background var(--t-fast),transform var(--t-fast) var(--ease)}
+.skill-row .ico{color:var(--text);transition:color var(--t-fast),text-shadow var(--t-fast)}
+.skill-row .s-name{font-weight:600;font-size:15px;letter-spacing:.04em}
+.skill-row .s-lv{font:700 12px var(--font-body);letter-spacing:.12em;color:var(--muted)}
+.bar{grid-column:1/-1;height:4px;background:rgba(255,255,255,.14);margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--text);transform-origin:left;transform:scaleX(var(--lv,0));
+  transition:transform 800ms var(--ease),background var(--t-fast),box-shadow var(--t-fast)}
+.reveal:not(.in) .bar i{transform:scaleX(0)}
+.skill-row:hover,.skill-row:focus-visible{background:rgba(var(--primary-rgb),.1);transform:translateX(4px)}
+.skill-row:hover .ico,.skill-row:focus-visible .ico{color:var(--primary);text-shadow:var(--glow-sm)}
+.skill-row:hover .bar i,.skill-row:focus-visible .bar i{background:var(--primary);box-shadow:var(--glow-sm)}
+.skill-row:hover .s-lv,.skill-row:focus-visible .s-lv{color:var(--text)}
+
+/* ---------- about ---------- */
+.about-grid{display:grid;grid-template-columns:340px 1fr;gap:34px}
+.photo{aspect-ratio:3/4;display:grid;place-items:center;color:var(--muted);overflow:hidden;
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.04) 0 10px,transparent 10px 20px)}
+.photo img{width:100%;height:100%;object-fit:cover}
+.info .row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.info .row:last-child{border:0}
+.info .k{font:700 12px var(--font-body);letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+.info .v{font-weight:600}
+.switch{width:46px;height:22px;background:rgba(255,255,255,.08);border:1px solid var(--line);position:relative;cursor:pointer;
+  transition:background var(--t-fast),box-shadow var(--t-fast)}
+.switch i{position:absolute;top:2px;left:2px;width:16px;height:16px;background:var(--text);transition:transform var(--t-fast) var(--ease)}
+.switch[aria-checked="true"]{background:rgba(var(--primary-rgb),.5);box-shadow:var(--glow-sm)}
+.switch[aria-checked="true"] i{transform:translateX(24px)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-top:22px}
+.stat{padding:18px 20px}
+.stat b{display:block;font-family:var(--font-display);font-weight:400;font-size:44px;line-height:1;color:var(--primary);text-shadow:var(--glow-sm)}
+.stat span{font-size:13px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+
+/* ---------- about photo carousel ---------- */
+.photo.carousel{display:block;position:relative;aspect-ratio:3/4;overflow:hidden;background:#000}
+.slides{display:flex;width:100%;height:100%;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.slides::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;height:100%;scroll-snap-align:start;scroll-snap-stop:always;margin:0}
+.slide img{width:100%;height:100%;object-fit:cover;display:block;user-select:none}
+.c-btn{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:42px;height:56px;display:grid;place-items:center;cursor:pointer;
+  font:400 34px/1 var(--font-display);color:var(--text);background:rgba(6,10,15,.72);border:1px solid var(--line);
+  transition:transform var(--t-fast) var(--ease),border-color var(--t-fast),box-shadow var(--t-fast),background var(--t-fast)}
+.c-btn.prev{left:0;border-left:0}
+.c-btn.next{right:0;border-right:0}
+.c-btn:hover,.c-btn:focus-visible{border-color:var(--primary);background:rgba(var(--primary-rgb),.35);box-shadow:var(--glow-sm);transform:translateY(-50%) scale(1.06)}
+.c-btn:active{transform:translateY(-50%) scale(.96)}
+.c-bar{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;
+  background:linear-gradient(transparent,rgba(6,10,15,.85))}
+.c-count{font:700 12px var(--font-body);letter-spacing:.18em;color:var(--text)}
+.dots{display:flex;gap:8px}
+.dot-btn{width:22px;height:5px;border:0;padding:0;background:rgba(255,255,255,.35);cursor:pointer;transition:background var(--t-fast),box-shadow var(--t-fast),transform var(--t-fast)}
+.dot-btn:hover{background:rgba(255,255,255,.7);transform:scaleY(1.6)}
+.dot-btn[aria-current="true"]{background:var(--primary);box-shadow:var(--glow-sm)}
+.slides:focus-visible{outline:2px solid var(--secondary);outline-offset:-2px}
+
+/* ---------- contact ---------- */
+#contact{text-align:center}
+.countdown{font-family:var(--font-display);font-size:90px;line-height:1;color:var(--primary);text-shadow:var(--glow-lg)}
+#contact .continue{font-family:var(--font-display);font-weight:400;font-size:clamp(44px,13vw,170px);line-height:.9;overflow-wrap:anywhere;letter-spacing:.03em;
+  text-transform:uppercase;text-shadow:0 0 40px rgba(var(--primary-rgb),.3);margin-bottom:14px}
+.contact-links{display:flex;gap:22px;flex-wrap:wrap;justify-content:center;margin-top:30px}
+footer{padding:30px 0 60px;text-align:center;color:var(--muted);font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+
+/* ---------- modal (case study) ---------- */
+#modal{position:fixed;inset:0;z-index:200;display:none;align-items:flex-start;justify-content:center;
+  background:rgba(4,7,11,.88);backdrop-filter:blur(6px);overflow-y:auto;padding:4vh 16px}
+#modal.open{display:flex}
+.m-box{position:relative;width:min(920px,100%);background:var(--panel-solid);border:1px solid var(--line-hot);border-left-width:5px;
+  box-shadow:var(--glow-lg);animation:modalIn 320ms var(--ease)}
+@keyframes modalIn{from{opacity:0;transform:translateY(30px) scale(.96)}to{opacity:1;transform:none}}
+.loader{position:absolute;inset:0;z-index:3;background:var(--panel-solid);display:grid;place-items:center;transition:opacity 250ms}
+.loader.done{opacity:0;pointer-events:none}
+.loader div.in{width:min(320px,70%);text-align:center}
+.loader small{font:700 12px var(--font-body);letter-spacing:.28em;color:var(--secondary)}
+.loader .lbar{height:6px;margin-top:14px;background:rgba(255,255,255,.12);overflow:hidden}
+.loader .lbar i{display:block;height:100%;transform-origin:left;transform:scaleX(0);background:linear-gradient(90deg,var(--primary),var(--secondary));animation:load 520ms ease-out forwards}
+@keyframes load{to{transform:scaleX(1)}}
+.m-head{padding:30px 30px 8px}
+.m-head h2{font-family:var(--font-display);font-weight:400;font-size:clamp(40px,6vw,64px);line-height:.95;letter-spacing:.03em;text-transform:uppercase}
+.m-body{padding:8px 30px 34px;display:grid;gap:14px}
+.m-sec{padding:18px 20px;border-left:3px solid var(--primary);background:rgba(0,0,0,.25)}
+.m-sec h3{font:700 12px var(--font-body);color:var(--primary);letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
+.m-sec p{color:var(--muted)}
+.m-sec ul{color:var(--muted);padding-left:18px;display:grid;gap:8px}.m-sec li b{color:var(--text,#ece8e1)}.m-sec p+p{margin-top:8px}
+.gal figure{margin:0;flex:1 1 320px;min-width:0}.gal figcaption{font-size:12px;color:var(--muted);margin-top:6px}
+.gal{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}
+.gal img{width:min(100%,260px);border:1px solid var(--line)}
+.m-close{position:absolute;top:14px;right:14px;z-index:4}
+
+/* ---------- particles / cursor / toast ---------- */
+#cursorGlow{position:fixed;top:0;left:0;width:360px;height:360px;margin:-180px 0 0 -180px;border-radius:50%;pointer-events:none;z-index:0;opacity:0;
+  transition:opacity .4s;background:radial-gradient(circle,rgba(var(--primary-rgb),.16),transparent 65%);will-change:transform}
+.particle{position:fixed;width:7px;height:7px;pointer-events:none;z-index:999;will-change:transform,opacity}
+#toast{position:fixed;bottom:48px;left:50%;transform:translate(-50%,40px);opacity:0;z-index:300;font:700 13px var(--font-body);letter-spacing:.16em;
+  text-transform:uppercase;background:var(--panel-solid);border:1px solid var(--secondary);color:var(--secondary);padding:12px 18px;
+  box-shadow:var(--glow-alt);transition:all 300ms var(--ease);pointer-events:none}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- responsive ---------- */
+@media(max-width:1099px){
+  #menuBtn{display:inline-block}
+  #menu{display:none;position:fixed;inset:var(--header-h) 0 0 0;left:0;top:var(--header-h);transform:none;background:rgba(8,13,19,.97);
+    padding:28px;overflow-y:auto;z-index:85}
+  #menu.open{display:block}
+  #menu a{font-size:46px}
+  #menu a.active{transform:none}
+}
+@media(max-width:899px){
+  .hero-grid,.about-grid{grid-template-columns:1fr}
+  .g2{grid-template-columns:1fr}
+  .photo-frame{max-width:340px}
+  section{padding:80px 0}
+  .banner-card{grid-template-columns:1fr}
+  .b-img{clip-path:none;min-height:110px}
+  .b-go{display:none}
+}
+@media(max-width:700px){
+  .back .slash{display:none}
+  #top{grid-template-columns:auto minmax(0,1fr) auto;padding:0 10px 0 14px;gap:8px}
+  .top-title{font-size:22px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .top-right{gap:6px}
+  .icon-btn{padding:8px 10px;white-space:nowrap}
+  .back{letter-spacing:.1em}
+}
+@media(max-width:520px){
+  body{font-size:16px}
+  .chip{display:none}
+  .g3,.g-projects{grid-template-columns:1fr}
+  .btn-start{padding:18px 30px;font-size:28px}
+  .btn{width:100%}
+  .promo{grid-template-columns:40px 1fr 40px}
+  .p-text b{font-size:20px}
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  #cursorGlow,.particle{display:none!important}
+  .sec-head,.reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+
+<body>
+<a href="#projects" class="sr-only">Skip to projects</a>
+<div id="cursorGlow" aria-hidden="true"></div>
+
+<!-- =======================================================
+     TOP BAR + MENU + RAIL + STATUS BAR
+     Replace Ethan Lee and the status text. Nav labels can be renamed.
+     ======================================================= -->
+<header id="top">
+  <a class="back" href="#hero" aria-label="Back to top"><span class="chev" aria-hidden="true">‹</span>Back<span class="slash"> // Ethan Lee</span></a>
+  <div class="top-title" id="topTitle" aria-hidden="true">Play</div>
+  <div class="top-right">
+    <span class="chip" id="xpChip" aria-hidden="true">XP 0%</span>
+    <button class="icon-btn" id="soundBtn" aria-pressed="true" aria-label="Toggle sound effects">SFX: ON</button>
+    <button class="icon-btn" id="menuBtn" aria-expanded="false" aria-controls="menu">Menu</button>
+  </div>
+</header>
+<div id="xp" aria-hidden="true"><i></i></div>
+
+<nav id="menu" aria-label="Primary">
+  <a href="#hero">Play</a>
+  <a href="#projects">Projects</a>
+  <a href="#experience">Career</a>
+  <a href="#teardowns">Teardowns</a>
+  <a href="#prototypes">Playables</a>
+  <a href="#skills">Skills</a>
+  <a href="#extras">Extras</a>
+  <a href="#about">Profile</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<aside id="rail" aria-hidden="true">
+  <div class="track" id="railXp"><i></i></div>
+  <div class="rail-name">Ethan Lee • Product Designer</div>
+</aside>
+
+<div class="party"><span class="dot" aria-hidden="true"></span>Status: <b>Open to work</b></div>
+
+<main>
+<!-- =======================================================
+     HERO — EDIT TEXT BELOW
+     ======================================================= -->
+<section id="hero" data-title="Play">
+  <div class="hero-art" aria-hidden="true"></div>
+  <div class="wrap hero-grid">
+    <div class="hero-main">
+      <!-- Announcement banner (like the "Join the Conflict" ad) -->
+      <a class="hud hoverable promo" href="#contact">
+        <span class="p-img" aria-hidden="true"></span>
+        <span class="p-text"><b>Open to work</b><small>Product design • Games</small></span>
+        <span class="p-img r" aria-hidden="true"></span>
+      </a>
+      <div class="eyebrow">Portfolio /// 2026</div>
+      <h1>Ethan Lee</h1>
+      <div class="hero-title">Product Designer</div>
+      <p class="hero-pitch">Product designer and game builder. I design emails, social launches, and game systems that keep people coming back.</p>
+      <div class="start-row">
+        <a href="resume.pdf" class="btn btn-ghost"><span class="fx"></span>Resume</a>
+        <a href="#projects" class="btn btn-start"><span class="fx"></span>View Projects</a>
+      </div>
+    </div>
+
+    <aside class="hero-side" aria-label="Player summary">
+      <div class="hud hoverable">
+        <div class="c-head"><b>Player Card</b><small>4 projects unlocked</small></div>
+        <div class="mini-row" aria-hidden="true">
+          <span class="mini">01</span><span class="mini">02</span><span class="mini">03</span><span class="mini">04</span>
+        </div>
+        <a class="c-link" href="#projects">View all projects ↗</a>
+      </div>
+      <div class="hud mission">
+        <h3 class="m-title">Current Missions</h3>
+        <ul>
+          <li class="skill-row" style="--lv:.5"><span class="ico" aria-hidden="true">✳</span><span class="s-name">Shipping Build a Tower & Fish a Fleet</span><span class="s-lv">ACTIVE</span><div class="bar" aria-hidden="true"><i></i></div></li>
+          <li class="skill-row" style="--lv:.3"><span class="ico" aria-hidden="true">✳</span><span class="s-name">Leading EZ Games’ second title</span><span class="s-lv">ACTIVE</span><div class="bar" aria-hidden="true"><i></i></div></li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section id="projects" data-title="Quest Log"><div class="wrap">
+  <header class="sec-head"><div class="kicker">// 01 — Level Select</div><h2>Quest Log</h2><p>Email systems, a social feature concept, and game systems.</p></header>
+  <div class="grid g-projects" id="projectGrid"></div>
+</div></section>
+
+<section id="experience" data-title="Career"><div class="wrap">
+  <header class="sec-head"><div class="kicker">// 02 — Save History</div><h2>Career Timeline</h2></header>
+  <div class="timeline" id="timeline"></div>
+</div></section>
+
+<section id="teardowns" data-title="Teardowns"><div class="wrap">
+  <header class="sec-head"><div class="kicker">// 03 — Analysis Mode</div><h2>Game Teardowns</h2><p>How existing products hold attention, and where I’d push them.</p></header>
+  <div id="teardownGrid"></div>
+</div></section>
+
+<section id="prototypes" data-title="Playables"><div class="wrap">
+  <header class="sec-head"><div class="kicker">// 04 — Try It</div><h2>Prototypes &amp; Playables</h2></header>
+  <div class="grid g2" id="protoGrid"></div>
+</div></section>
+
+<section id="skills" data-title="Skill Tree"><div class="wrap">
+  <header class="sec-head"><div class="kicker">// 05 — Unlocked Abilities</div><h2>Skill Tree</h2></header>
+  <div class="grid g3" id="skillTree"></div>
+</div></section>
+
+<section id="extras" data-title="Extras"><div class="wrap">
+  <header class="sec-head"><div class="kicker">// 06 — Side Quests</div><h2>Education &amp; Extras</h2></header>
+  <div class="grid g3" id="extrasGrid"></div>
+</div></section>
+
+<section id="about" data-title="Player Profile"><div class="wrap">
+  <header class="sec-head"><div class="kicker">// 07 — Character Sheet</div><h2>Player Profile</h2></header>
+  <div class="about-grid">
+    <div class="reveal photo-frame"><div class="hud" style="padding:8px"><div class="photo" id="aboutPhoto">[Photo slot]</div></div></div>
+    <div class="reveal">
+      <p id="aboutBio" style="color:var(--muted);font-size:19px;margin-bottom:22px"></p>
+      <div class="hud info" id="infoPanel"></div>
+      <div class="stats" id="stats"></div>
+      <div class="tags" id="interests" style="margin-top:22px"></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- =======================================================
+     CONTACT — EDIT LINKS BELOW
+     ======================================================= -->
+<section id="contact" data-title="Continue?"><div class="wrap">
+  <header class="sec-head" style="text-align:center"><div class="kicker">// 08 — Game Over?</div></header>
+  <div class="countdown" id="countdown" aria-hidden="true">9</div>
+  <h2 class="continue">Continue?</h2>
+  <p style="color:var(--muted)">Hiring for product design or games? I’d love to talk.</p>
+  <div class="contact-links">
+    <a class="btn btn-start" href="mailto:ethanlee@ucla.edu"><span class="fx"></span>Email</a>
+    <a class="btn alt" href="https://www.linkedin.com/in/ethanlee"><span class="fx"></span>LinkedIn</a>
+    <a class="btn btn-ghost" href="resume.pdf" download><span class="fx"></span>Download Resume</a>
+    <a class="btn btn-ghost" href="https://www.instagram.com/_ethanzlee/" target="_blank" rel="noopener"><span class="fx"></span>My Instagram</a>
+  </div>
+</div></section>
+</main>
+
+<footer>© 2026 Ethan Lee • Built to be played</footer>
+
+<!-- Case study modal -->
+<div id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle" aria-hidden="true">
+  <div class="m-box">
+    <div class="loader" id="loader"><div class="in"><small>LOADING LEVEL…</small><div class="lbar"><i></i></div></div></div>
+    <button class="icon-btn m-close" id="mClose" aria-label="Close case study">✕ Close</button>
+    <div class="m-head"><span class="lvl" id="mLvl"></span><h2 id="mTitle"></h2><div class="role" id="mRole" style="margin-top:8px"></div><div class="tags" id="mTags"></div></div>
+    <div class="m-body" id="mBody"></div>
+  </div>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ==========================================================
+   1) CONTENT CONFIG — REPLACE ALL [PLACEHOLDERS] HERE
+   (Hero + contact text are in the commented HTML blocks above.
+   Strings accept simple HTML.)
+   ========================================================== */
+const CONFIG = {
+  showEmptySlot: true,   // shows the empty "+" slot after the last project
+  /* Project images: export frames from Figma and save them in an "images" folder next to index.html.
+     Missing images fall back to a placeholder automatically. Case-study text marked [Add: ...] is for you to fill in. */
+  projects: [
+    {title:"Fracture: Year of the Horse Launch", role:"Email Designer • Feb 2026 – Present • Figma", summary:"A launch email sequence for 18 new pieces, from announcement to restock.", tags:["UX","Live-ops"], thumb:"images/yoth-live.png",
+     gallery:["images/yoth-live.png","images/yoth-announce.png","images/store-is-live.png"],
+     study:{
+      overview:"Designed the email sequence for Fracture Kenkyo’s Year of the Horse collection in Figma: the announcement (18 pieces available 2/17), a short-film feature (‘Meet the Fam’), VIP early access, the live-collection launch, and restock follow-ups. Across Fracture’s email templates and newsletters, open rate reached 57%.",
+      problem:"Fracture was coming back after stepping back to rebuild its systems, and needed a launch sequence that rebuilt anticipation, kept the brand voice consistent from email to email, and gave customers one clear next step each time.",
+      role:"Designed the email templates and newsletters in Figma and maintained Fracture’s brand voice across every send. Part of Fracture Kenkyo since Feb 2026.",
+      process:"Layouts were designed at 600px wide and sliced into sections for email. [Add: how you planned the sequence, tested subject lines or layouts, and iterated.]",
+      decisions:"Concept-led storytelling (‘The horse represents forward motion. progress without hesitation.’), a short lowercase brand voice, and one clear call to action per email (‘Take a look’, ‘Enter year of the horse’, ‘Shop the restock’).",
+      final:"The collection-live email, plus the announcement and store-is-live emails. See them in the <a href=\"https://www.figma.com/design/PDG1oVrzJicjxAHyQwyWU1/launch?node-id=0-1\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--secondary)\">launch emails Figma file</a> (set it to ‘anyone with the link can view’ so visitors can open it).",
+      impact:"57% email open rate across Fracture’s templates and newsletters. [Add: click-through, sales, or sell-through numbers if you have them.]",
+      different:"[Add: what you’d change or test next time.]"}},
+    {title:"BeReal: New Social Feature Concept", role:"Product Management Extern • Jun – Aug 2026 • Figma, Canva", summary:"Competitor research turned into a prototyped feature concept and a pitch deck.", tags:["Research","UX","Prototyping"], thumb:"images/bereal-externship.png",
+     gallery:["images/bereal-externship.png"],
+     study:{
+      overview:"During a product management externship at BeReal, I benchmarked competitors, mapped user journeys, and prototyped a brand-new social feature concept, then pitched it to stakeholders.",
+      problem:"Find gaps in the market and in user engagement that BeReal could act on, and turn them into one concrete feature idea. [Add: the specific problem you chose to solve.]",
+      role:"Product Management Extern: research, journey mapping, prototyping in Figma and Canva, and building the stakeholder pitch deck.",
+      process:"Benchmarked competitors like TikTok, Instagram, and Snapchat to identify market gaps and engagement strategies. Mapped active user journeys and analyzed feedback to prototype the concept. [Add: the research methods and feedback sources you used.]",
+      decisions:"[Add: 2–3 tradeoffs you made and why.]",
+      final:"A Figma and Canva prototype of the new feature concept. [Add: screens or a clip.]",
+      impact:"Synthesized the research and strategy into a stakeholder pitch deck that aligned leadership on clear roadmap priorities.",
+      different:"[Add: what you’d change or test next time.]"}},
+    {title:"Roblox: Build a Tower & Fish a Fleet", role:"Game Developer • Sept 2026 – Present • Roblox Studio, Luau", summary:"A monster-defense game and a tycoon game with upgrade balancing and gacha rolls.", tags:["Systems","Live-ops","Prototyping"], thumb:"images/fish-fleet.jpg",
+     gallery:["images/fish-fleet.jpg"],
+     study:{
+      overview:"Two Roblox games built with Luau object-oriented patterns: Build a Tower, a monster-defense game, and Fish a Fleet, a tycoon game. I built the core gameplay loop, backend data models, and enemy AI.",
+      problem:"Keep players coming back after launch with progression that stays balanced as it scales, and make sure their progress is never lost. [Add: the specific design problem you focused on.]",
+      role:"Sole developer and designer (personal project): gameplay loop, backend data models, enemy AI, upgrade balancing, and gacha rolls.",
+      process:"[Add: how you prototyped, playtested, and tuned the games.]",
+      decisions:"Modular, scalable systems for player data persistence and tower-upgrade balancing, and weighted gacha-roll algorithms, with automated cloud save syncing to protect progress and support launch retention.",
+      final:"[Add: screenshots, a trailer, or a link to play.]",
+      impact:"[Add: visits, players, retention, or playtest results.]",
+      different:"[Add: what you’d change or test next time.]"}},
+    {title:"EZ Games: 3-Level Game", role:"Game Developer • Jun 2026 – Present • Godot, Blender", summary:"A three-level game with custom 3D assets and mechanics that build in depth.", tags:["Prototyping","Systems"], thumb:"images/necos-ascent.jpg",
+     gallery:["images/necos-ascent.jpg"],
+     study:{
+      overview:"A 3-level game built in Godot and Blender with custom 3D assets and progressive mechanics for enhanced gameplay depth. I’m now leading end-to-end development of a second title.",
+      problem:"[Add: the player experience you were designing for.]",
+      role:"Game Developer: modular player movement, physics, state management, and UI systems; now leading development of a second title using OOP patterns and asset pipelines.",
+      process:"[Add: how you planned levels and tested the mechanics.]",
+      decisions:"Modular systems for movement, physics, state, and UI, so performance stays smooth and new mechanics can be added level by level.",
+      final:"Title screen from Neco’s Ascent. [Add: gameplay screenshots, a trailer, or a link to play.]",
+      impact:"[Add: playtest results or what shipped.]",
+      different:"[Add: what you’d change or test next time.]"}}
+  ],
+  caseStudyDefaults: {
+    overview:"[Add: what the project was and the outcome in 2–3 sentences.]",
+    problem:"[Add: who was struggling, with what, and why it mattered.]",
+    role:"[Add: responsibilities, team size, collaborators.]",
+    process:"[Add: research, ideation, prototyping, testing.]",
+    decisions:"[Add: 2–3 tradeoffs and why you chose what you did.]",
+    final:"[Add: describe or embed screens / video here.]",
+    impact:"[Add: numbers, playtest results, qualitative wins.]",
+    different:"[Add: honest reflection.]"
+  },
+  experience: [
+    {company:"Bon Health", title:"Associate Marketing Intern", dates:"Jun 2026 – Present • Los Angeles, CA", bullets:["Spearheaded omni-channel acquisition campaigns across all socials, boosting patient leads by 34% and cutting CAC by 18%","Engineered retention funnels via email/SMS campaigns, improving sign-up conversion by 25% and 90-day retention by 15%","Partnered with cross-functional teams to launch ad content, accelerating time-to-market by 30% and organic traffic by 42%"]},
+    {company:"Fracture Kenkyo", title:"Social Media Intern", dates:"Feb 2026 – Present • Los Angeles, CA", bullets:["Developed highly engaging visual posts for Instagram and TikTok, which led to a 17% increase in follower growth","Designed email templates and newsletters using Figma, and maintained brand voice, achieving a 57% open rate","Refined brand identity by creating community-building events, publicizing them with graphics tailored for seasonal launches"]},
+    {company:"BeReal", title:"Product Management Externship", dates:"Jun 2026 – Aug 2026 • Torrance, CA", bullets:["Benchmarked competitors like TikTok, Instagram, and Snapchat to identify market gaps and user engagement strategy","Mapped active user journeys and analyzed feedback to prototype a brand new social feature concept using Figma and Canva","Synthesized market research and strategy into a stakeholder pitch deck, aligning leadership on clear roadmap priorities"]},
+    {company:"EZ Games", title:"Game Developer", dates:"Jun 2026 – Present • Los Angeles, CA", bullets:["Built a 3-level game in Godot and Blender with custom 3D assets and progressive mechanics for enhanced gameplay depth","Engineered modular player movement, physics, state management, and UI systems to ensure smooth performance","Leading end-to-end development of a second title using OOP patterns and asset pipelines across all development stages"]},
+    {company:"Swing Sensei", title:"Backend Developer", dates:"Mar 2026 – Present • Los Angeles, CA", bullets:["Architected backend infrastructure for real-time AI golf swing analysis, processing videos with WebSockets and PyTorch","Designed RESTful APIs and schemas to support swing-feedback models and speed up video processing via Redis caching","Optimized vision pipelines and server memory, boosting concurrent throughput by 40% using multi-threaded worker pools"]},
+    {company:"Alpha Kappa Psi Professional Business Fraternity", title:"Director of Marketing", dates:"Apr 2026 – Present • Los Angeles, CA", bullets:["Designed and led a 10-week professional development program, mentoring members in interviews, key skills, and consulting","Secured $2000+ in chapter funding through targeted corporate outreach, establishing partnerships with 3 corporate sponsors","Executed a one-week recruitment event by organizing information sessions, hosting 100+ attendees and driving chapter growth"]}
+  ],
+  teardowns: [
+    {game:"BeReal vs TikTok, Instagram, Snapchat", title:"Competitive Benchmark: Social Engagement", summary:"Benchmarked TikTok, Instagram, and Snapchat to find market gaps and user engagement opportunities for BeReal.", tags:["Teardown","Research"], thumb:"images/bereal-logo.png", link:"#"},
+    {game:"Valorant", title:"Front-of-House Teardown: Menu, Party & New-Player Flow", summary:"A UX teardown of Valorant’s main menu and party screen: what makes it feel fast and competitive, where new players hit friction, and a proposed redesign.", tags:["Teardown","UX","Redesign"], thumb:"images/valorant-logo.png", thumbBg:"#111721", thumbFit:"cover", link:"#",
+     gallery:[{src:"images/valorant-menu.jpg",cap:"Main menu: nav, contract progress, intro missions"},{src:"images/valorant-play.jpg",cap:"Play screen: party slots, queue settings, Start CTA"}],
+     study:{
+      overview:"<p>Valorant’s front-of-house is the screen players see before every match, dozens of times a week. I took apart the main menu and the Play/party screen to understand how they get a squad into a match quickly, and where a first-time player might stall. This is an independent analysis based on screenshots and public patch notes. The redesign ideas are my own proposals, not Riot’s.</p>",
+      works:"<ul><li><b>One dominant action.</b> “PLAY” is larger and red while Career, Battlepass, Collection, Agents and Store are smaller and white. The hierarchy tells you what to do in under a second.</li><li><b>Red is reserved for primary actions.</b> On the Play screen, START is the only red button; Practice and Leave Party are muted secondary buttons.</li><li><b>Party state is visible at a glance.</b> Queue type, party code and open/closed toggle sit beside the slots, and empty slots show a clear “+”.</li><li><b>Consistent HUD language.</b> Angular panels, thin line weights and condensed caps carry from the menu into the game itself.</li><li><b>Persistent social rail.</b> Friends and party status stay on the right edge on every screen.</li></ul>",
+      friction:"<ul><li><b>Locked agents are all icons, no names.</b> The “Play to unlock agents” panel shows five padlocked icons with only “1,500 XP to go”. A new player can’t tell which agent they’re earning or why it matters.</li><li><b>Competing progress systems.</b> A 0/2 counter, XP to go, intro mission bars (0/30, 0/35) and a Battlepass tab all appear on one screen with similar visual weight.</li><li><b>Small, low-contrast type.</b> Mission labels and “View Contract” are tiny grey text on a busy illustration, which hurts legibility.</li><li><b>Promo banner above the party.</b> On the Play screen a banner sits in the primary focus area, above the party slots and competing with the core task.</li><li><b>Queue settings are tucked at the side.</b> The mode (Unrated) is a small label far from the Start button, so it’s easy to queue in the wrong mode.</li></ul>",
+      redesign:"<ul><li><b>Name the reward.</b> Show the next agent to unlock, with its name and role, as the hero of the contract panel. Keep the other four as smaller silhouettes.</li><li><b>One active goal at a time.</b> For new accounts, show a single “Next up” card (the current intro mission plus XP reward) and collapse the rest behind “View all”.</li><li><b>Raise legibility.</b> Add a darker panel scrim and bump mission text up a size so it reads over the key art.</li><li><b>Bring queue mode to the CTA.</b> Put the selected mode as a dropdown directly above START, so the player confirms what they’re queuing for at the point of action.</li><li><b>Demote promos.</b> Move the banner to a dismissible slot below the party area so the party and Start stay the focal point.</li></ul>",
+      tradeoffs:"<p>Collapsing missions reduces discoverability for returning players, so I’d only apply the simplified view to new accounts and let it expand over time. Featuring one agent also cuts down on player choice, so the full contract should stay one click away. Moving promos can affect store and event visibility, which the business cares about. I’d test placement rather than remove it.</p>",
+      measure:"<p>These are the metrics I’d use to test the changes, not results I’ve measured: time from launch to first queue, share of new players who complete their first intro mission, wrong-mode queue cancellations, and click-through on the relocated promo. I’d A/B test with new accounts only first, since they’re the most affected group.</p>"
+     }},
+    {game:"Next Up", title:"Coming Soon", summary:"More game teardowns and redesign proposals are in the works. Check back soon.", tags:["Coming Soon"], soon:true, link:"#"}
+  ],
+  prototypes: [
+    {title:"Fracture Social Media/Creatives", desc:"Post and reel designs for sales, restocks, brand story, and community events. Generated over 700k views across socials.", embed:'<img src="images/fracture-instagram.png" alt="Fracture Kenkyo Instagram profile: 78 posts and 37.1K followers" loading="lazy">', link:"https://www.instagram.com/fracturekenkyo/"},
+    {title:"Neco’s Journey (Godot)", desc:"Gameplay from my pixel platformer: fire and bolt spells, coins and souls to collect, and a king boss fight. Press play.", embed:'<video controls muted loop playsinline preload="metadata" poster="images/necos-journey-poster.jpg" src="images/necos-journey.mp4"></video>', link:"images/necos-journey.mp4"}
+    /* embed: paste an <iframe ...> or <video ...> HTML string to fill the slot */
+  ],
+  /* skills: [name, level 1–5]. Levels are my starting guesses: adjust them. */
+  skills: {
+    "Design":[["Figma",4],["Email & Social Design",4],["Blender (3D assets)",3]],
+    "Research":[["Competitive Benchmarking",3],["User Journey Mapping",3],["Market Research",3]],
+    "Prototyping":[["Figma & Canva",4],["Godot",3],["Roblox Studio (Luau)",3]],
+    "Systems / Economy":[["Upgrade Balancing",3],["Gacha / Weighted Drops",3],["Player Data & Cloud Saves",3]],
+    "Collaboration":[["Cross-functional Launches",4],["Public Speaking",4],["Korean (Professional)",4]]
+  },
+  extras: {
+    "Education":["B.A. Cognitive Science • UCLA • Expected Jun 2028","Coursework: Data Structures & Algorithms (C++), Object-Oriented Programming, Discrete Mathematics, Linguistic Analysis, Multivariable Calculus, Differential Equations"],
+    "Awards":["[Add: award • year]"],
+    "Leadership":["Director of Marketing • Alpha Kappa Psi • Apr 2026 – Present"],
+    "Side Projects":["Build a Tower & Fish a Fleet (Roblox)","EZ Games titles (Godot, Blender)"],
+    "Games I Play":["Minecraft","Pokémon cards","Card games","Board games","[Add: favorite video games]"]
+  },
+  about: {
+    /* photos: swipeable carousel. Put image files in the images folder; any number of photos works. */
+    photos:[
+      {src:"images/about-1.jpg", alt:"Ethan Lee in a navy suit and red tie"},
+      {src:"images/about-2.jpg", alt:"Ethan Lee sitting on limestone rocks outdoors"},
+      {src:"images/about-3.jpg", alt:"Ethan Lee in a black tank top and shorts beside an ivy-covered wall"}
+    ],
+    bio:"I’m a Cognitive Science student at UCLA who designs and builds things people come back to, from email and social systems for a streetwear brand to progression systems in Roblox games. I want to bring that mix of product thinking and hands-on game building to a game studio.",
+    rows:[["School","UCLA • Class of 2028"],["Based in","Los Angeles, CA"],["Languages","Korean (Professional Proficiency)"],["Tools","Figma, Godot, Blender, Roblox Studio"]],
+    toggleLabel:"Open to work",
+    stats:[["57%","Email open rate"],["17%","Follower growth lift"],["100+","Event attendees"],["$2,000+","Funding secured"]],
+    interests:["Cafes","Latte art","Dance","Music","Volleyball","Guitar","Pokémon cards","Minecraft","Card games","Board games","Snowboarding"]
+  }
+};
+/* Skills note: each group takes a list of [name, level]. Example:
+   "Design":[["Figma",5],["Motion",3],["UI Systems",4]] */
+
+/* ==========================================================
+   2) SOUND SETTINGS — tweak frequencies, durations, volume
+   ========================================================== */
+const SOUNDS = {
+  master: 0.06,   // overall volume (keep low)
+  hover:  {f:880,  to:1040, dur:0.05, type:"sine"},
+  click:  {f:220,  to:90,   dur:0.09, type:"square"},
+  open:   {seq:[520,660,880], step:0.045, dur:0.07, type:"triangle"}, // rising chime
+  close:  {f:200,  to:110,  dur:0.12, type:"sine"}                     // lower tone
+};
+
+/* ========================================================== */
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $  = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+const el = html=>{const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstChild};
+const cssVar = n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+/* ---------- Audio (starts after first interaction; state in memory only) ---------- */
+let soundOn = true, ctx = null;
+function initAudio(){
+  if(!ctx){ try{ ctx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ ctx=null } }
+  if(ctx && ctx.state==='suspended') ctx.resume();
+}
+['pointerdown','keydown','touchstart'].forEach(e=>addEventListener(e,initAudio,{passive:true}));
+function tone(f,to,dur,type,delay=0){
+  if(!ctx||!soundOn) return;
+  const t=ctx.currentTime+delay, o=ctx.createOscillator(), g=ctx.createGain();
+  o.type=type; o.frequency.setValueAtTime(f,t); if(to) o.frequency.exponentialRampToValueAtTime(to,t+dur);
+  g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(SOUNDS.master,t+0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+dur+0.02);
+}
+const sfx = {
+  hover(){const s=SOUNDS.hover;tone(s.f,s.to,s.dur,s.type)},
+  click(){const s=SOUNDS.click;tone(s.f,s.to,s.dur,s.type)},
+  open(){const s=SOUNDS.open;s.seq.forEach((f,i)=>tone(f,f*1.05,s.dur,s.type,i*s.step))},
+  close(){const s=SOUNDS.close;tone(s.f,s.to,s.dur,s.type)}
+};
+const soundBtn=$('#soundBtn');
+soundBtn.addEventListener('click',()=>{
+  soundOn=!soundOn; soundBtn.setAttribute('aria-pressed',soundOn); soundBtn.textContent='SFX: '+(soundOn?'ON':'OFF');
+});
+
+/* ---------- Render content ---------- */
+const tagsHTML = a=>a.map(t=>`<span class="tag">${t}</span>`).join('');
+const FX = '<span class="fx"></span>';
+
+$('#projectGrid').append(...CONFIG.projects.map((p,i)=>el(`
+  <article class="slot reveal" style="transition-delay:${i*70}ms">
+    <button class="card-btn hud pennant hoverable" data-project="${i}" aria-haspopup="dialog">
+      <div class="thumb"><span class="lvl">Level ${String(i+1).padStart(2,'0')}</span>${p.thumb?`<img src="${p.thumb}" alt="" onerror="this.outerHTML='<span>[Add image: ${p.thumb}]</span>'">`:'<span>[Add thumbnail]</span>'}</div>
+      <h3 class="t">${p.title}</h3><div class="role">${p.role}</div>
+      <div class="tags">${tagsHTML(p.tags)}</div><p class="sm">${p.summary}</p>
+      <span class="open-hint">▶ Open case study</span>
+    </button>
+  </article>`)));
+if(CONFIG.showEmptySlot) $('#projectGrid').append(el(`<div class="empty-slot reveal" aria-hidden="true"><span>+</span><small>More coming</small></div>`));
+
+$('#timeline').append(...CONFIG.experience.map(x=>el(`
+  <div class="t-item reveal"><div class="hud hoverable">
+    <h3>${x.title} <span>@ ${x.company}</span></h3>
+    <div class="meta">${x.dates}</div><ul>${x.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>
+  </div></div>`)));
+
+$('#teardownGrid').append(...CONFIG.teardowns.map(t=>el(`
+  <div class="reveal"><a href="${t.link}" ${t.soon?'style="pointer-events:none" aria-disabled="true" tabindex="-1"':''} ${t.study?`data-teardown="${CONFIG.teardowns.indexOf(t)}"`:''} class="banner-card hud hoverable">
+    <div class="b-img"${t.thumbBg?` style="background:${t.thumbBg}"`:''}>${t.thumb?`<img src="${t.thumb}" alt="${t.game} thumbnail"${t.thumbFit?` style="object-fit:${t.thumbFit};padding:0;transform:scale(.86);transform-origin:38% 50%"`:''} onerror="this.remove()">`:(t.soon?'<span style="position:absolute;inset:0;display:grid;place-items:center;font:700 13px var(--font-body);letter-spacing:.25em;color:var(--secondary)">LOCKED</span>':'[Image]')}</div>
+    <div class="b-text"><span class="lvl">${t.game}</span><h3 class="t">${t.title}</h3>
+      <div class="tags">${tagsHTML(t.tags)}</div><p class="sm">${t.summary}</p></div>
+    ${t.soon?'':'<span class="b-go" aria-hidden="true">▶</span>'}
+  </a></div>`)));
+
+$('#protoGrid').append(...CONFIG.prototypes.map(p=>el(`
+  <div class="reveal"><article class="hud hoverable">
+    <div class="embed">${p.embed||'[Embed: Figma prototype, playable demo, or video clip]'}</div>
+    <h3 class="t">${p.title}</h3><p class="sm">${p.desc}</p>
+    <a class="btn alt sm" href="${p.link}" ${/^https?:/.test(p.link)?'target="_blank" rel="noopener"':''} style="margin-top:14px">${FX}Open</a>
+  </article></div>`)));
+
+$('#skillTree').append(...Object.entries(CONFIG.skills).map(([g,val])=>{
+  const list = Array.isArray(val[0]) ? val : [val];   // accepts [name,level] or [[name,level],...]
+  return el(`<div class="reveal"><div class="hud mission"><h3 class="m-title">${g}</h3><ul>${
+    list.map(([n,l])=>`<li class="skill-row" tabindex="0" style="--lv:${l/5}"><span class="ico" aria-hidden="true">✳</span><span class="s-name">${n}</span><span class="s-lv">LV ${l} / 5</span><div class="bar" aria-hidden="true"><i></i></div></li>`).join('')
+  }</ul></div></div>`);
+}));
+
+$('#extrasGrid').append(...Object.entries(CONFIG.extras).map(([g,list])=>el(`
+  <div class="reveal"><div class="hud hoverable extra"><h3>${g}</h3><ul>${list.map(s=>`<li>${s}</li>`).join('')}</ul></div></div>`)));
+
+/* ---------- Photo carousel (swipe, scroll, buttons, dots, arrow keys) ---------- */
+function buildCarousel(root,photos){
+  const n=photos.length;
+  root.classList.add('carousel');
+  root.innerHTML=`
+    <div class="slides" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Photos of Ethan Lee. Use left and right arrow keys to switch photos.">
+      ${photos.map((p,i)=>`<figure class="slide" role="group" aria-roledescription="slide" aria-label="Photo ${i+1} of ${n}"><img src="${p.src}" alt="${p.alt||''}" ${i?'loading="lazy"':''} draggable="false"></figure>`).join('')}
+    </div>
+    ${n>1?`<button class="c-btn prev" type="button" aria-label="Previous photo">‹</button><button class="c-btn next" type="button" aria-label="Next photo">›</button>
+    <div class="c-bar"><span class="c-count" aria-live="polite">01 / ${String(n).padStart(2,'0')}</span><div class="dots">${photos.map((_,i)=>`<button type="button" class="dot-btn" aria-label="Show photo ${i+1}"></button>`).join('')}</div></div>`:''}`;
+  if(n<2) return;
+  const sl=$('.slides',root), dots=$$('.dot-btn',root), count=$('.c-count',root);
+  let cur=0;
+  const go=i=>{cur=(i+n)%n; sl.scrollTo({left:cur*sl.clientWidth,behavior:reduced?'auto':'smooth'})};
+  const mark=()=>{const i=Math.round(sl.scrollLeft/sl.clientWidth); dots.forEach((d,k)=>d.setAttribute('aria-current',k===i?'true':'false')); count.textContent=String(i+1).padStart(2,'0')+' / '+String(n).padStart(2,'0'); cur=i};
+  sl.addEventListener('scroll',()=>requestAnimationFrame(mark),{passive:true});
+  $('.prev',root).addEventListener('click',()=>go(cur-1));
+  $('.next',root).addEventListener('click',()=>go(cur+1));
+  dots.forEach((d,i)=>d.addEventListener('click',()=>go(i)));
+  sl.addEventListener('keydown',e=>{ if(e.key==='ArrowRight'){e.preventDefault();go(cur+1)} if(e.key==='ArrowLeft'){e.preventDefault();go(cur-1)} });
+  addEventListener('resize',()=>{sl.scrollTo({left:cur*sl.clientWidth,behavior:'auto'})});
+  mark();
+}
+
+(()=>{const a=CONFIG.about;
+  if(a.photos&&a.photos.length) buildCarousel($('#aboutPhoto'),a.photos);
+  $('#aboutBio').textContent=a.bio;
+  $('#infoPanel').innerHTML=a.rows.map(r=>`<div class="row"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join('')+
+    `<div class="row"><span class="k">${a.toggleLabel}</span><button class="switch" role="switch" aria-checked="true" aria-label="${a.toggleLabel}"><i></i></button></div>`;
+  $('#stats').append(...a.stats.map(s=>el(`<div class="hud hoverable stat"><b>${s[0]}</b><span>${s[1]}</span></div>`)));
+  $('#interests').innerHTML=tagsHTML(a.interests);
+})();
+
+/* ---------- Particles ---------- */
+function burst(x,y,n=14,spread=90){
+  if(reduced) return;
+  const colors=[cssVar('--primary'),cssVar('--secondary'),cssVar('--text')];
+  for(let i=0;i<n;i++){
+    const p=document.createElement('div'); p.className='particle';
+    p.style.left=x+'px'; p.style.top=y+'px'; p.style.background=colors[i%colors.length];
+    document.body.appendChild(p);
+    const a=Math.random()*Math.PI*2, d=spread*(.4+Math.random()*.9);
+    p.animate([{transform:'translate(0,0) scale(1)',opacity:1},
+               {transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px) scale(.2)`,opacity:0}],
+              {duration:450+Math.random()*250,easing:'cubic-bezier(.2,.8,.3,1)'}).onfinish=()=>p.remove();
+  }
+}
+function confetti(){
+  if(reduced){toast('Konami unlocked!');return}
+  const cols=[cssVar('--primary'),cssVar('--secondary'),cssVar('--text'),'#ffd447','#8a6bff'];
+  for(let i=0;i<110;i++){
+    const p=document.createElement('div'); p.className='particle';
+    p.style.left=(Math.random()*innerWidth)+'px'; p.style.top='-10px'; p.style.background=cols[i%cols.length];
+    document.body.appendChild(p);
+    p.animate([{transform:'translate(0,0) rotate(0)',opacity:1},
+      {transform:`translate(${(Math.random()-.5)*300}px,${innerHeight+40}px) rotate(${Math.random()*720}deg)`,opacity:.9}],
+      {duration:1500+Math.random()*1500,delay:Math.random()*400,easing:'cubic-bezier(.3,.6,.4,1)'}).onfinish=()=>p.remove();
+  }
+}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2600)}
+
+/* ---------- Hover / click feedback (delegated) ---------- */
+const INTERACTIVE='a,button,.skill-row,.hoverable';
+let lastHover=null;
+document.addEventListener('mouseover',e=>{
+  const t=e.target.closest(INTERACTIVE);
+  if(t && t!==lastHover){lastHover=t;sfx.hover()} else if(!t){lastHover=null}
+});
+document.addEventListener('pointerdown',e=>{
+  const t=e.target.closest('a,button,.hoverable'); if(!t) return;
+  sfx.click();
+  burst(e.clientX,e.clientY);
+  if(t.classList.contains('btn')){
+    t.classList.add('pressed');
+    t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
+    if(!reduced){
+      const host=t.querySelector('.fx')||t, r=host.getBoundingClientRect(), s=Math.max(r.width,r.height)*2, d=document.createElement('span');
+      d.className='ripple'; d.style.cssText=`width:${s}px;height:${s}px;left:${e.clientX-r.left-s/2}px;top:${e.clientY-r.top-s/2}px`;
+      host.appendChild(d); setTimeout(()=>d.remove(),600);
+    }
+    const up=()=>{t.classList.remove('pressed');removeEventListener('pointerup',up);removeEventListener('pointercancel',up)};
+    addEventListener('pointerup',up);addEventListener('pointercancel',up);
+  }
+});
+
+/* profile toggle */
+document.addEventListener('click',e=>{
+  const sw=e.target.closest('.switch'); if(!sw) return;
+  sw.setAttribute('aria-checked', sw.getAttribute('aria-checked')==='true'?'false':'true');
+});
+
+/* ---------- Case study modal ---------- */
+const modal=$('#modal'), loader=$('#loader'); let lastFocus=null;
+const SECTIONS=[['overview','Overview'],['problem','Problem'],['role','My Role'],['process','Process'],
+  ['decisions','Key Decisions'],['final','Final Design'],['impact','Impact / Metrics']];
+function openStudy(i){
+  const p=CONFIG.projects[i], s=Object.assign({},CONFIG.caseStudyDefaults,p.study||{});
+  lastFocus=document.activeElement;
+  $('#mLvl').textContent='Level '+String(i+1).padStart(2,'0');
+  $('#mTitle').textContent=p.title; $('#mRole').textContent=p.role; $('#mTags').innerHTML=tagsHTML(p.tags);
+  $('#mBody').innerHTML=SECTIONS.map(([k,l])=>`<div class="m-sec"><h3>${l}</h3><p>${s[k]}</p>${k==='final'&&p.gallery?`<div class="gal">${p.gallery.map(g=>`<img src="${g}" alt="" loading="lazy" onerror="this.remove()">`).join('')}</div>`:''}</div>`).join('');
+  modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
+  modal.scrollTop=0;
+  loader.classList.remove('done'); const bar=$('.lbar i',loader); bar.style.animation='none'; void bar.offsetWidth; bar.style.animation='';
+  sfx.open();
+  setTimeout(()=>loader.classList.add('done'), reduced?0:540);
+  $('#mClose').focus();
+}
+const TD_SECTIONS=[['overview','Overview'],['works','What Works'],['friction','Friction I Found'],['redesign','Redesign Proposal'],['tradeoffs','Tradeoffs & Risks'],['measure','How I’d Measure It']];
+function openTeardown(i){
+  const t=CONFIG.teardowns[i], s=t.study; if(!s) return;
+  lastFocus=document.activeElement;
+  $('#mLvl').textContent='Teardown'; $('#mTitle').textContent=t.title; $('#mRole').textContent=t.game; $('#mTags').innerHTML=tagsHTML(t.tags);
+  $('#mBody').innerHTML=TD_SECTIONS.map(([k,l])=>`<div class="m-sec"><h3>${l}</h3>${s[k]}${k==='overview'&&t.gallery?`<div class="gal">${t.gallery.map(g=>`<figure><img src="${g.src}" alt="${g.cap}" loading="lazy" style="width:100%" onerror="this.parentNode.remove()"><figcaption>${g.cap}</figcaption></figure>`).join('')}</div>`:''}</div>`).join('');
+  modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
+  modal.scrollTop=0;
+  loader.classList.remove('done'); const bar=$('.lbar i',loader); bar.style.animation='none'; void bar.offsetWidth; bar.style.animation='';
+  sfx.open(); setTimeout(()=>loader.classList.add('done'), reduced?0:540); $('#mClose').focus();
+}
+function closeStudy(){
+  modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.style.overflow='';
+  sfx.close(); if(lastFocus) lastFocus.focus();
+}
+document.addEventListener('click',e=>{
+  const td=e.target.closest('[data-teardown]'); if(td){e.preventDefault(); openTeardown(+td.dataset.teardown); return;}
+  const c=e.target.closest('[data-project]'); if(c) openStudy(+c.dataset.project);
+  if(e.target===modal || e.target.closest('#mClose')) closeStudy();
+});
+document.addEventListener('keydown',e=>{
+  if(!modal.classList.contains('open')) return;
+  if(e.key==='Escape') closeStudy();
+  if(e.key==='Tab'){ // focus trap
+    const f=$$('button,a[href],[tabindex]:not([tabindex="-1"])',modal).filter(x=>!x.disabled&&x.offsetParent!==null);
+    if(!f.length) return; const a=f[0], z=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}
+    else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}
+  }
+});
+
+/* ---------- Scroll: XP bars, reveals, active menu + top title ---------- */
+const xpBar=$('#xp i'), railFill=$('#railXp i'), chip=$('#xpChip'); let lastPct=-1;
+function onScroll(){
+  const h=document.documentElement.scrollHeight-innerHeight, r=h>0?Math.min(1,scrollY/h):0;
+  xpBar.style.transform=`scaleX(${r})`; railFill.style.transform=`scaleY(${r})`;
+  const pct=Math.round(r*100); if(pct!==lastPct){lastPct=pct;chip.textContent='XP '+pct+'%'}
+}
+addEventListener('scroll',()=>requestAnimationFrame(onScroll),{passive:true}); onScroll();
+
+const io=new IntersectionObserver(es=>es.forEach(en=>{
+  if(en.isIntersecting){
+    en.target.classList.add('in'); io.unobserve(en.target);
+    if(en.target.classList.contains('sec-head')) sfx.hover();
+  }
+}),{threshold:.15});
+$$('.sec-head,.reveal').forEach(n=>io.observe(n));
+
+const topTitle=$('#topTitle'), menuLinks=$$('#menu a');
+const secIO=new IntersectionObserver(es=>es.forEach(en=>{
+  if(!en.isIntersecting) return;
+  const id=en.target.id;
+  menuLinks.forEach(a=>{
+    const on=a.getAttribute('href')==='#'+id;
+    a.classList.toggle('active',on);
+    on?a.setAttribute('aria-current','true'):a.removeAttribute('aria-current');
+  });
+  const t=en.target.dataset.title;
+  if(t && topTitle.textContent!==t){
+    topTitle.textContent=t; topTitle.classList.remove('swap'); void topTitle.offsetWidth; topTitle.classList.add('swap');
+  }
+}),{rootMargin:'-45% 0px -50% 0px'});
+$$('main section').forEach(s=>secIO.observe(s));
+
+/* mobile menu */
+const menu=$('#menu'), menuBtn=$('#menuBtn');
+menuBtn.addEventListener('click',()=>{
+  const o=menu.classList.toggle('open'); menuBtn.setAttribute('aria-expanded',o);
+});
+menuLinks.forEach(a=>a.addEventListener('click',()=>{menu.classList.remove('open');menuBtn.setAttribute('aria-expanded','false')}));
+addEventListener('keydown',e=>{ if(e.key==='Escape'&&menu.classList.contains('open')){menu.classList.remove('open');menuBtn.setAttribute('aria-expanded','false');menuBtn.focus()} });
+
+/* ---------- Cursor glow (desktop, motion-ok only) ---------- */
+if(!reduced && matchMedia('(pointer:fine)').matches){
+  const g=$('#cursorGlow'); let mx=0,my=0,ticking=false;
+  addEventListener('mousemove',e=>{
+    mx=e.clientX;my=e.clientY; g.style.opacity=1;
+    if(!ticking){ticking=true;requestAnimationFrame(()=>{g.style.transform=`translate(${mx}px,${my}px)`;ticking=false})}
+  },{passive:true});
+  document.addEventListener('mouseleave',()=>g.style.opacity=0);
+}
+
+/* ---------- Contact countdown (decorative) ---------- */
+(()=>{
+  const c=$('#countdown'); let n=9;
+  new IntersectionObserver((es,ob)=>{ if(es[0].isIntersecting){
+    ob.disconnect(); const iv=setInterval(()=>{ n--; c.textContent=n>=0?n:'∞'; if(n<0) clearInterval(iv) }, 450);
+  }},{threshold:.6}).observe(c);
+})();
+
+/* ---------- Easter egg: Konami code ---------- */
+const KONAMI=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let kpos=0;
+addEventListener('keydown',e=>{
+  const k=e.key.length===1?e.key.toLowerCase():e.key;
+  kpos = (k===KONAMI[kpos]) ? kpos+1 : (k===KONAMI[0]?1:0);
+  if(kpos===KONAMI.length){kpos=0;confetti();sfx.open();toast('★ Cheat code activated ★')}
+});
+</script>
+</body>
+</html>
